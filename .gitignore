@@ -15,4 +15,4 @@ screenshoot/*
 !screenshoot/.gitkeep
 
 # Cookies file
-#cookies.txt
+cookies.txt
