@@ -126,17 +126,41 @@ function updateProgress() {
                 if (data.downloaded.length > lastDownloadedCount) {
                     lastDownloadedCount = data.downloaded.length;
                 }
+                // --- FUNGSI BANTUAN UNTUK MEMOTONG NAMA FILE ---
+                function formatFileName(fileName) {
+                    // Cek jika ada ekstensi .mp4 atau .mp4.part di akhir
+                    let isMp4 = fileName.toLowerCase().endsWith('.mp4');
+                    let isPart = fileName.toLowerCase().endsWith('.mp4.part');
+                    
+                    let nameWithoutExt = fileName;
+                    let ext = "";
+                    
+                    if (isMp4) {
+                        nameWithoutExt = fileName.substring(0, fileName.length - 4);
+                        ext = ".mp4";
+                    } else if (isPart) {
+                        nameWithoutExt = fileName.substring(0, fileName.length - 9);
+                        ext = ".mp4.part";
+                    }
 
+                    // Potong nama jika lebih dari 20 karakter
+                    if (nameWithoutExt.length > 20) {
+                        nameWithoutExt = nameWithoutExt.substring(0, 20) + "...";
+                    }
+                    
+                    return nameWithoutExt + ext;
+                }
                 // FILE SELESAI
                 data.files.forEach(file => {
                     const card = document.createElement("div");
                     card.className = "file-card";
+                    const displayFileName = formatFileName(file); // Gunakan format
 
                     card.innerHTML = `
                         <video class="thumb" preload="metadata">
                             <source src="projects/${project}/${file}#t=1" type="video/mp4">
                         </video>
-                        <p>${file}</p>
+                        <p title="${file}">${displayFileName}</p>
                     `;
 
                     grid.appendChild(card);
@@ -146,12 +170,13 @@ function updateProgress() {
                 data.downloaded.forEach(file => {
                     const card = document.createElement("div");
                     card.className = "file-card";
+                    const displayFileName = formatFileName(file); // Gunakan format
 
                     card.innerHTML = `
                         <video class="thumb" preload="metadata">
                             <source src="projects/${project}/${file}#t=1" type="video/mp4">
                         </video>
-                        <p>${file}</p>
+                        <p title="${file}">${displayFileName}</p>
                     `;
 
                     grid.appendChild(card);
@@ -159,15 +184,14 @@ function updateProgress() {
 
                 // FILE SEDANG DOWNLOAD
                 data.downloading.forEach(file => {
-
                     const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-
                     const card = document.createElement("div");
                     card.className = "file-card";
+                    const displayFileName = formatFileName(file.name); // Gunakan format untuk .part
 
                     card.innerHTML = `
                         <div class="thumb placeholder"></div>
-                        <p>${file.name}</p>
+                        <p title="${file.name}">${displayFileName}</p>
 
                         <div class="mini-progress">
                             <div class="mini-fill"></div>

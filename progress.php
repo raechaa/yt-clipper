@@ -10,10 +10,19 @@ if (!is_dir($path)) {
 
 $metaFile = $path . "/meta.json";
 $total = 0;
+$expectedFiles = [];
+$expectedBaseNames = [];
 
+// Ambil data total dan expected_files dari meta.json
 if (file_exists($metaFile)) {
     $meta = json_decode(file_get_contents($metaFile), true);
     $total = $meta['total'] ?? 0;
+    $expectedFiles = $meta['expected_files'] ?? [];
+    
+    // Buat daftar nama file mentah (tanpa awalan final_)
+    foreach ($expectedFiles as $ef) {
+        $expectedBaseNames[] = str_replace('final_', '', $ef);
+    }
 }
 
 $completed = [];
@@ -24,23 +33,34 @@ foreach (scandir($path) as $f) {
     if ($f === '.' || $f === '..') continue;
 
     $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
-
     $fullPath = $path . "/" . $f;
 
     if (in_array($ext, ['mp4'])) {
         if (str_starts_with($f, 'final_')) {
-            $completed[] = $f;
+            // HANYA hitung jika file ini bagian dari proses saat ini
+            if (in_array($f, $expectedFiles)) {
+                $completed[] = $f;
+            }
         }
         else
         {
-            $downloaded[] = $f;
+            // HANYA hitung jika file mentah ini bagian dari proses saat ini
+            if (in_array($f, $expectedBaseNames)) {
+                $downloaded[] = $f;
+            }
         }
     }
     else if ($ext === 'part') {
-        $downloading[] = [
-            "name" => $f,
-            "size" => filesize($fullPath)
-        ];
+        // Cek apakah file .part ini milik salah satu file yang sedang diproses
+        foreach ($expectedBaseNames as $baseName) {
+            if (str_starts_with($f, $baseName)) {
+                $downloading[] = [
+                    "name" => $f,
+                    "size" => filesize($fullPath)
+                ];
+                break; // Hentikan loop jika sudah cocok
+            }
+        }
     }
 }
 

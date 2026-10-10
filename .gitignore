@@ -1,3 +1,16 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Composer dependencies
+/vendor/
+
+# Local configuration containing secrets
+/ai-analyze.php
+
+# Projects folder
 projects/
-downloads/
+
+# Cookies file
 cookies.txt
