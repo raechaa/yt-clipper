@@ -9,8 +9,8 @@
 # Local configuration containing secrets
 /ai-analyze.php
 
-# Projects folder
-projects/
+# Projects folder data
+projects/*
 
 # Cookies file
 cookies.txt
