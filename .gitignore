@@ -12,5 +12,8 @@
 # Projects folder data
 projects/*
 
+# Bawa nama foldernya
+!Projects/.gitkeep
+
 # Cookies file
 cookies.txt
